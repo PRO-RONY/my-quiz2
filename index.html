@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الاختبار الوطني للحاسوب - نسخة 2027</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #673ab7;
+            --primary-hover: #5e35b1;
+            --bg-color: #f0ebf8;
+            --surface: #ffffff;
+            --error: #d32f2f;
+            --success: #388e3c;
+            --text-main: #202124;
+            --text-secondary: #5f6368;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Cairo', sans-serif;
+            color: var(--text-main);
+            margin: 0;
+            padding-bottom: 80px; /* Space for progress bar */
+        }
+
+        .form-container {
+            max-w-3xl: 768px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .card {
+            background-color: var(--surface);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 2px 6px 2px rgba(60,64,67,0.15), 0 1px 2px 0 rgba(60,64,67,0.3);
+        }
+
+        .header-card {
+            border-top: 10px solid var(--primary);
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .input-text {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #dadce0;
+            padding: 8px 0;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-bottom-color 0.3s, background-color 0.3s;
+            background-color: transparent;
+        }
+
+        .input-text:focus {
+            outline: none;
+            border-bottom: 2px solid var(--primary);
+            background-color: #f8f9fa;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .radio-label:hover {
+            background-color: #f1f3f4;
+        }
+
+        input[type="radio"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-secondary);
+            border-radius: 50%;
+            margin-left: 12px;
+            position: relative;
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="radio"]:checked {
+            border-color: var(--primary);
+        }
+
+        input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary);
+            border-radius: 50%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Practice mode specific styles */
+        .option-correct {
+            background-color: #e6f4ea !important;
+            border: 1px solid var(--success);
+        }
+        .option-incorrect {
+            background-color: #fce8e6 !important;
+            border: 1px solid var(--error);
+        }
+        .explanation-box {
+            background-color: #f1f3f4;
+            border-right: 4px solid var(--primary);
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+
+        .progress-bar-bg {
+            flex-grow: 1;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin: 0 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Timer */
+        .timer-display {
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="max-w-3xl mx-auto p-4 sm:p-6" id="app">
+        
+        <!-- Header Section -->
+        <div class="card header-card">
+            <h1 class="text-3xl font-bold mb-2">الملزمة الشاملة للاختبار الوطني للحاسوب</h1>
+            <p class="text-gray-600 mb-4">نسخة 2027 - إعداد المدرب رزاق إبراهيم. يحتوي هذا الاختبار على أسئلة حديثة وشاملة لمواصفات الاختبار الوطني.</p>
+            <div class="text-sm text-red-600 font-semibold mb-4 border-b pb-4">
+                تنبيه: هذا اختبار إلكتروني يحاكي أسئلة الملزمة. يُرجى اختيار وضع الاختبار المناسب لك.
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 mt-4">
+                <div class="flex-1">
+                    <label class="block text-sm font-semibold mb-2 text-gray-700">وضع الاختبار:</label>
+                    <select id="examMode" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-purple-500">
+                        <option value="practice">وضع التدريب (إظهار صحة الإجابة فوراً)</option>
+                        <option value="exam">وضع الامتحان (إظهار النتيجة النهائية فقط)</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="block text-sm font-semibold mb-2 text-gray-700">المؤقت الزمني (اختياري):</label>
+                    <select id="timerSelect" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-purple-500">
+                        <option value="0">بدون مؤقت</option>
+                        <option value="15">15 دقيقة</option>
+                        <option value="30">30 دقيقة</option>
+                        <option value="60">60 دقيقة</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Info -->
+        <div class="card" id="studentInfoCard">
+            <label for="studentName" class="block text-lg font-semibold mb-2">الاسم الثلاثي <span class="text-red-500">*</span></label>
+            <input type="text" id="studentName" class="input-text" placeholder="أدخل اسمك هنا..." required>
+            <div id="nameError" class="text-red-500 text-sm mt-2 hidden">يرجى إدخال اسمك للبدء.</div>
+            
+            <button id="startBtn" class="btn-primary mt-6 w-full sm:w-auto" onclick="startQuiz()">ابدأ الاختبار</button>
+        </div>
+
+        <!-- Quiz Container (Hidden initially) -->
+        <div id="quizContainer" class="hidden">
+            <!-- Questions will be injected here -->
+            <div id="questionsList"></div>
+
+            <div class="card mt-6 flex justify-end">
+                <button id="submitBtn" class="btn-primary" onclick="submitQuiz()">تسليم الاختبار</button>
+            </div>
+        </div>
+
+        <!-- Results Container (Hidden initially) -->
+        <div id="resultsContainer" class="hidden card header-card text-center">
+            <h2 class="text-3xl font-bold mb-4 text-gray-800">نتيجة الاختبار</h2>
+            <p id="resultStudentName" class="text-xl mb-2"></p>
+            <div class="text-5xl font-bold text-purple-700 mb-6" id="finalScoreDisplay"></div>
+            
+            <div class="grid grid-cols-3 gap-4 mb-6 text-sm sm:text-base">
+                <div class="bg-green-100 text-green-800 p-3 rounded">
+                    إجابات صحيحة: <span id="correctCount" class="font-bold"></span>
+                </div>
+                <div class="bg-red-100 text-red-800 p-3 rounded">
+                    إجابات خاطئة: <span id="incorrectCount" class="font-bold"></span>
+                </div>
+                <div class="bg-gray-100 text-gray-800 p-3 rounded">
+                    لم يُجب عليها: <span id="unansweredCount" class="font-bold"></span>
+                </div>
+            </div>
+
+            <button class="btn-primary mt-4" onclick="location.reload()">إجراء اختبار جديد</button>
+            <button class="btn-primary mt-4 bg-gray-600 hover:bg-gray-700 mr-2" id="showAnswersBtn" onclick="showCorrectAnswers()">مراجعة الإجابات</button>
+        </div>
+
+    </div>
+
+    <!-- Fixed Progress & Timer Bar -->
+    <div class="progress-container hidden" id="progressContainer">
+        <div class="timer-display" id="timerDisplay">--:--</div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+        <div class="text-sm font-semibold text-gray-600 w-24 text-left">
+            <span id="answeredCount">0</span> / <span id="totalQuestionsCount">0</span>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const QUESTION_SCORE = 1; // درجة كل سؤال
+
+        // Database of Questions extracted from the PDF
+        // q: Question text, opts: array of options, correct: index of correct option (0-based), exp: explanation/note
+        const quizData = [
+            // --- أساسيات الحاسوب والويندوز ---
+            {
+                q: "Microsoft Windows is: (مايكروسوفت ويندوز هو:)",
+                opts: ["Word Processing Program", "Database Program", "Operating System (نظام تشغيل)", "Graphics Program"],
+                correct: 2,
+                exp: "ويندوز هو النظام الذي يدير الجهاز ويشغل البرامج وليس برنامجاً للكتابة أو الرسومات."
+            },
+            {
+                q: "What is the 'Start' menu in a standard personal computer? (ما هي قائمة أبدأ؟)",
+                opts: ["Hardware part", "An option and set of commands (خيارات ومجموعة أوامر)", "Nothing, only status bar", "Network related"],
+                correct: 1,
+                exp: "قائمة أبدأ تحتوي على مجموعة من الأوامر والخيارات مثل فتح البرامج وإعدادات النظام."
+            },
+            {
+                q: "Function key in a Windows keyboard can perform many functions, which of the following is not a default? (أي مفتاح وظائف ليس له وظيفة افتراضية؟)",
+                opts: ["F1", "F6", "F8", "F9"],
+                correct: 3,
+                exp: "المفاتيح (F1-F12) لها وظائف، أما F9 فلا وظيفة افتراضية شائعة له في ويندوز."
+            },
+            {
+                q: "What is Windows Explorer? (ما هو مستكشف ويندوز؟)",
+                opts: ["Personal Computer", "Network", "File Manager (مدير الملفات)", "Drive", "Web Browser"],
+                correct: 2,
+                exp: "مستكشف ويندوز هو برنامج إدارة الملفات والمجلدات والبحث والتنقل بينها."
+            },
+            {
+                q: "All the deleted files go to: (جميع الملفات المحذوفة تنتقل إلى:)",
+                opts: ["Recycle Bin (سلة المحذوفات)", "Task Bar", "Tool Bar", "Computer"],
+                correct: 0,
+                exp: "سلة المحذوفات تحتفظ بالملفات المحذوفة مؤقتاً قبل حذفها نهائياً."
+            },
+            {
+                q: "Date and time are available on the desktop at: (يظهر التاريخ والوقت على سطح المكتب في:)",
+                opts: ["Keyboard", "Recycle Bin", "My Computer", "Task Bar (شريط المهام)"],
+                correct: 3,
+                exp: "شريط المهام (Task Bar) هو المكان الذي يعرض التاريخ والوقت في أسفل الشاشة."
+            },
+            {
+                q: "Menus are the part of: (تعد القوائم جزءاً من:)",
+                opts: ["Hardware", "User Interface (واجهة المستخدم)", "Status Bar", "Monitor"],
+                correct: 1,
+                exp: "القوائم هي عناصر في واجهة المستخدم تحتوي على أوامر."
+            },
+            {
+                q: "Which of the following shortcut keys is used to close the current or active window? (اختصار إغلاق النافذة الحالية؟)",
+                opts: ["Alt + F4", "Ctrl + F4", "Alt + F6", "Ctrl + Esc"],
+                correct: 0,
+                exp: "اختصار سريع يستخدم لإغلاق النافذة الحالية أو البرنامج المفتوح."
+            },
+            {
+                q: "A/An.......... contains programs that can be selected. (يحتوي على برامج يمكن اختيارها)",
+                opts: ["Pointer", "Menu (القائمة)", "Icon", "Button"],
+                correct: 1,
+                exp: "القائمة (Menu) تحتوي على مجموعة من الأوامر والبرامج التي يمكن اختيارها."
+            },
+            {
+                q: "The desktop of a computer refers to: (سطح المكتب يشير إلى:)",
+                opts: ["the visible screen (الشاشة الظاهرة)", "the area around the monitor", "the top of the mouse pad", "the inside of a folder"],
+                correct: 0,
+                exp: "سطح المكتب هو الشاشة الظاهرة أمام المستخدم التي تحتوي على الأيقونات."
+            },
+            {
+                q: "Factor making Windows popular is: (العامل الذي جعل ويندوز شائعاً هو:)",
+                opts: ["multitasking capacity", "desktop features", "user friendly (سهل الاستخدام)", "being inexpensive"],
+                correct: 2,
+                exp: "من مميزات سطح المكتب في ويندوز سهولة الاستخدام."
+            },
+            {
+                q: "What are .bas, .doc, .htm examples of in computing? (أمثلة على ماذا؟)",
+                opts: ["Extensions (امتدادات)", "Protocols", "Database", "Domains"],
+                correct: 0,
+                exp: "الامتداد هو الجزء الأخير من اسم الملف ويحدد نوعه."
+            },
+            {
+                q: "The steps involved to open a document are:",
+                opts: ["select the document to open from the File menu", "click on the Open option in the Tools menu", "Both 1 and 2 (كلاهما)", "can be different for different Word document"],
+                correct: 2,
+                exp: "لفتح مستند نختار المستند من قائمة File ثم نضغط Open."
+            },
+            {
+                q: "........ lets you leave a screen or program. (يتيح لك الخروج من الشاشة)",
+                opts: ["Boot", "Programs", "Exit (خروج)", "Text"],
+                correct: 2,
+                exp: "خيار (Exit) يعني خروج من البرنامج."
+            },
+            {
+                q: "Which of the following keys is used to delete characters to the left of the cursor? (حذف الأحرف يسار المؤشر)",
+                opts: ["Alt + Delete", "Shift", "Esc", "Delete", "Backspace"],
+                correct: 4,
+                exp: "مفتاح Backspace يحذف الحرف الذي على يسار المؤشر."
+            },
+            {
+                q: "........ menu type is also known as a drop down menu. (القائمة المنسدلة)",
+                opts: ["Fly-down", "Pop-down", "Pop-up", "Pull-down (منسدلة)"],
+                correct: 3,
+                exp: "القائمة المنسدلة تظهر خيارات عند النقر على أي قائمة رئيسية."
+            },
+            {
+                q: "To shrink a window to an icon, (لتصغير النافذة إلى أيقونة)",
+                opts: ["open a group window", "minimize a window (تصغير)", "maximize a window", "restore a window"],
+                correct: 1,
+                exp: "خيار Minimize يقوم بتصغير النافذة إلى شريط المهام."
+            },
+            {
+                q: "What is the default file extension for all Word documents? (الامتداد الافتراضي لمستند وورد)",
+                opts: ["WRD", "TXT", "DOC / DOCX", "FIL"],
+                correct: 2,
+                exp: "امتداد الملف الافتراضي في برنامج وورد هو DOC أو DOCX."
+            },
+            {
+                q: "Which of the following shortcut keys represents the correct sequence for copy, paste and cut? (نسخ، لصق، قص)",
+                opts: ["Ctrl+V : Ctrl+C : Ctrl+V", "Ctrl+C : Ctrl+V : Ctrl+X", "Ctrl+X : Ctrl+C : Ctrl+V", "Ctrl+C : Ctrl+X : Ctrl+V"],
+                correct: 1,
+                exp: "الترتيب الصحيح: نسخ (Ctrl+C)، لصق (Ctrl+V)، قص (Ctrl+X)."
+            },
+            {
+                q: "Why do you log-off from your computer when going out from your office? (لماذا تسجل خروج؟)",
+                opts: ["Someone might steal your files, passwords, etc. (لمنع سرقة الملفات)", "In order to save electricity", "Logging off is essential to increase performance", "Logging off is mandatory before you go out"],
+                correct: 0,
+                exp: "لمنع الآخرين من الوصول إلى ملفاتك وكلمات المرور."
+            },
+            {
+                q: "What menu is selected to cut, copy and paste? (أي قائمة للقص والنسخ واللصق؟)",
+                opts: ["File", "Tools", "Special", "Edit (تحرير)"],
+                correct: 3,
+                exp: "قائمة تحرير (Edit)."
+            },
+            {
+                q: "Generally, you access the Recycle Bin through an icon located: (الوصول لسلة المحذوفات من خلال أيقونة في:)",
+                opts: ["on the desktop (سطح المكتب)", "on the hard drive", "on the shortcut menu", "in the properties dialog box"],
+                correct: 0,
+                exp: "أيقونة سلة المحذوفات موجودة بشكل افتراضي على سطح المكتب."
+            },
+            {
+                q: "In Windows NT, NT stands for:",
+                opts: ["New Terminology", "New Technique", "New Technology (التقنية الجديدة)", "Normal Technique"],
+                correct: 2,
+                exp: "NT تعني التقنية الجديدة."
+            },
+            {
+                q: "A file is often referred to as a: (يشار للملف غالباً بـ:)",
+                opts: ["wizard", "document (مستند)", "pane", "device"],
+                correct: 1,
+                exp: "يشار للملف النصي وغيره بمصطلح مستند (Document)."
+            },
+            {
+                q: "When you install a new program on your computer, it is typically added to the menu:",
+                opts: ["All Programs (كافة البرامج)", "Select Programs", "Start Programs", "Desktop Programs"],
+                correct: 0,
+                exp: "جميع البرامج المثبتة تظهر في قائمة (All Programs)."
+            },
+            // --- الإنترنت والمتصفحات ---
+            {
+                q: "What is HTML? (ما هي HTML؟)",
+                opts: ["HyperText Markup Language (لغة ترميز النص التشعبي)", "High Text Machine Language", "HyperTest Management Language", "HyperTransfer Markup Language"],
+                correct: 0,
+                exp: "HTML هي اللغة الأساسية المستخدمة لبناء صفحات الويب."
+            },
+            {
+                q: "What does WWW stand for? (ماذا تعني WWW؟)",
+                opts: ["World Wide Web (الشبكة العالمية)", "World Whole Web", "Wide World Web", "Web World Wide"],
+                correct: 0,
+                exp: "اختصار لـ World Wide Web."
+            },
+            {
+                q: "What is an Internet search engine? (محرك البحث هو:)",
+                opts: ["A program that scans web pages for viruses.", "A program that updating Web page.", "A program that searches the Internet for specific words, images... (برنامج يبحث في الإنترنت)", "Program that creates a network connection."],
+                correct: 2,
+                exp: "مثل جوجل، يساعدنا في العثور على المعلومات."
+            },
+            {
+                q: "What is the definition of browser? (تعريف المتصفح؟)",
+                opts: ["A program used to display html files on the Internet (برنامج لعرض صفحات الويب)", "A program used to create HTML files", "A program used to draw HTML files", "A program used to protect the computer"],
+                correct: 0,
+                exp: "المتصفح هو البرنامج المستخدم لعرض صفحات الإنترنت."
+            },
+            {
+                q: "If a website is not loading correctly, which action might help? (إذا لم يفتح الموقع بشكل صحيح؟)",
+                opts: ["Delete your browsing history", "Turn off your computer", "Refresh the page or clear your browser cache (تحديث الصفحة)", "Disable WiFi"],
+                correct: 2,
+                exp: "تحديث الصفحة أو مسح الكاش يساعد في حل مشاكل التحميل."
+            },
+            {
+                q: "Which network device is used to connect different networks together? (جهاز يربط شبكات مختلفة)",
+                opts: ["Switch", "Hub", "Router (الموجه / الراوتر)", "Repeater"],
+                correct: 2,
+                exp: "الراوتر يربط شبكات مختلفة مثل شبكة المنزل بالإنترنت."
+            },
+            {
+                q: "What does LAN stand for? (ماذا تعني LAN؟)",
+                opts: ["Local Area Network (شبكة محلية)", "Large Application Network", "Long Access Network", "Low Application Network"],
+                correct: 0,
+                exp: "شبكة تغطي مساحة محدودة كالمكتب أو المنزل."
+            },
+            {
+                q: "What does WAN stand for? (ماذا تعني WAN؟)",
+                opts: ["Wide Area Network (شبكة واسعة النطاق)", "World Area Network", "Web Area Network", "Winchester Area Network"],
+                correct: 0,
+                exp: "تغطي مساحات جغرافية واسعة كالدول."
+            },
+            {
+                q: "What happens when you download a file from a website? (ماذا يحدث عند التنزيل؟)",
+                opts: ["Saved automatically in the Trash", "Stored on the website server", "Saved in the Downloads folder on your device (يحفظ في مجلد التنزيلات)", "Sent to your e-mail"],
+                correct: 2,
+                exp: "يحفظ الملف محلياً في مجلد Downloads."
+            },
+            {
+                q: "What does the lock symbol at the bottom/top of the browser indicate? (على ماذا يدل القفل؟)",
+                opts: ["The browser prevents unauthorized connections", "The browser is connecting using an encrypted connection (اتصال مشفر وأمن)", "The website is secured and user cannot enter", "Protected from minors"],
+                correct: 1,
+                exp: "يعني أن الاتصال آمن ومشفر (HTTPS)."
+            },
+            {
+                q: "What is a hyperlink? (ما هو الارتباط التشعبي؟)",
+                opts: ["A web page", "A link that takes you from one page to another (رابط ينقلك لصفحة أخرى)", "A programming language", "A program"],
+                correct: 1,
+                exp: "يسمح بالانتقال من صفحة لأخرى عند النقر عليه."
+            },
+            {
+                q: "To save a page and return to it later, place a mark: (لحفظ صفحة للرجوع إليها، تضع علامة:)",
+                opts: ["Paper clip", "Arrow", "Star (نجمة - المفضلة)", "Anchor"],
+                correct: 2,
+                exp: "علامة النجمة (Star) تستخدم لحفظ الصفحات في المفضلة (Bookmarks)."
+            },
+            {
+                q: "What is Phishing? (التصيد الإلكتروني؟)",
+                opts: ["A type of cyberattack aimed at stealing personal data (هجوم لسرقة البيانات)", "A type of antivirus program", "A secure encrypted e-mail service", "Sending bulk e-mails"],
+                correct: 0,
+                exp: "هجوم يهدف إلى خداع المستخدم لسرقة معلوماته."
+            },
+            {
+                q: "When you receive spam e-mail, do not click on: (في البريد المزعج، لا تضغط على:)",
+                opts: ["Reply", "Auto-forward", "Links and attachments (الروابط والمرفقات)", "Clicking does not matter"],
+                correct: 2,
+                exp: "الروابط والمرفقات قد تحتوي على فيروسات أو برمجيات خبيثة."
+            },
+            {
+                q: "What is Email short for? (اختصار لـ؟)",
+                opts: ["Express mail", "Easy mail", "Enhanced mail", "Electronic mail (البريد الإلكتروني)"],
+                correct: 3,
+                exp: "Email تعني Electronic Mail."
+            },
+            // --- الهاردوير والمفاهيم الأساسية ---
+            {
+                q: "What is the smallest unit of data? (أصغر وحدة بيانات؟)",
+                opts: ["Bit (بت)", "Byte", "KB", "MB"],
+                correct: 0,
+                exp: "أصغر وحدة هي البت وتمثل 0 أو 1."
+            },
+            {
+                q: "A Byte consists of: (يتكون البايت من:)",
+                opts: ["4 Bits", "8 Bits (8 بت)", "16 Bits", "32 Bits"],
+                correct: 1,
+                exp: "البايت الواحد يتكون من 8 بت لتمثيل حرف واحد."
+            },
+            {
+                q: "ROM (Read Only Memory) can be read but cannot be written to. (ذاكرة القراءة فقط لا يمكن الكتابة عليها)",
+                opts: ["True (صح)", "False", "Temporary Memory", "Cache Memory"],
+                correct: 0,
+                exp: "ROM هي ذاكرة للقراءة فقط وتحتفظ بالبيانات الأساسية للنظام."
+            },
+            {
+                q: "Which component is considered the brain of the computer? (عقل الحاسوب؟)",
+                opts: ["CPU (المعالج المركزي)", "RAM", "Hard Disk", "Monitor"],
+                correct: 0,
+                exp: "المعالج (CPU) هو المسؤول عن تنفيذ الأوامر."
+            },
+            {
+                q: "Which component is the central board inside the computer? (اللوحة الرئيسية؟)",
+                opts: ["Motherboard (اللوحة الأم)", "CPU", "RAM", "Hard Disk"],
+                correct: 0,
+                exp: "اللوحة الأم تربط جميع أجزاء الحاسوب الداخلية."
+            },
+            {
+                q: "Which of the following is an output device? (أي مما يلي جهاز إخراج؟)",
+                opts: ["Scanner", "Microphone", "Plotter (الراسمة / الطابعة)", "Keyboard"],
+                correct: 2,
+                exp: "الراسمات والطابعات والشاشات هي أجهزة إخراج."
+            },
+            {
+                q: "Using a projector to present a presentation is considered a(n): (استخدام جهاز العرض يعتبر عملية:)",
+                opts: ["Giving Commands", "Processing", "Input", "Output (إخراج)"],
+                correct: 3,
+                exp: "جهاز العرض (Projector) يعرض المعلومات، لذا فهو جهاز إخراج."
+            },
+            {
+                q: "What does GB mean? (ماذا يعني GB؟)",
+                opts: ["Gilo Bit", "Giga Byte (جيجابايت)", "Giga Bits", "Gilo Byte"],
+                correct: 1,
+                exp: "GB هو اختصار Giga Byte ويستخدم لقياس سعة التخزين."
+            },
+            {
+                q: "What is Malware? (ما هو الـ Malware؟)",
+                opts: ["Malicious software (برنامج ضار)", "Antivirus software", "Internet browsing software", "Browser editing software"],
+                correct: 0,
+                exp: "هي برمجيات خبيثة مصممة لإلحاق الضرر بالحاسوب."
+            },
+            {
+                q: "What is e-commerce? (ما هي التجارة الإلكترونية؟)",
+                opts: ["Exchanging goods without money", "Buying and selling using the internet (البيع والشراء عبر الإنترنت)", "Exchanging goods through big companies", "Buying and selling using a scanner"],
+                correct: 1,
+                exp: "عملية البيع والشراء باستخدام الإنترنت."
+            }
+        ];
+
+        // State Variables
+        let currentMode = 'exam';
+        let userAnswers = {};
+        let timerInterval = null;
+        let timeRemaining = 0;
+        let isSubmitted = false;
+
+        // Elements
+        const studentInfoCard = document.getElementById('studentInfoCard');
+        const quizContainer = document.getElementById('quizContainer');
+        const questionsList = document.getElementById('questionsList');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const answeredCountEl = document.getElementById('answeredCount');
+        const totalQuestionsCountEl = document.getElementById('totalQuestionsCount');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const submitBtn = document.getElementById('submitBtn');
+        const examModeSelect = document.getElementById('examMode');
+        const timerSelect = document.getElementById('timerSelect');
+
+        // Initialization
+        totalQuestionsCountEl.textContent = quizData.length;
+
+        function startQuiz() {
+            const nameInput = document.getElementById('studentName').value.trim();
+            if (!nameInput) {
+                document.getElementById('nameError').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('nameError').classList.add('hidden');
+            
+            currentMode = examModeSelect.value;
+            const timerMins = parseInt(timerSelect.value);
+
+            // Hide info card, show quiz
+            studentInfoCard.classList.add('hidden');
+            examModeSelect.disabled = true;
+            timerSelect.disabled = true;
+            
+            renderQuestions();
+            quizContainer.classList.remove('hidden');
+            progressContainer.classList.remove('hidden');
+
+            if (timerMins > 0) {
+                startTimer(timerMins);
+            } else {
+                timerDisplay.style.display = 'none';
+            }
+            
+            // Scroll to top of first question
+            window.scrollTo({top: quizContainer.offsetTop - 20, behavior: 'smooth'});
+        }
+
+        function renderQuestions() {
+            questionsList.innerHTML = '';
+            quizData.forEach((q, index) => {
+                const card = document.createElement('div');
+                card.className = 'card question-card';
+                card.id = `q-card-${index}`;
+                
+                let optionsHtml = '';
+                q.opts.forEach((opt, optIndex) => {
+                    optionsHtml += `
+                        <label class="radio-label" id="label-${index}-${optIndex}">
+                            <input type="radio" name="q${index}" value="${optIndex}" onchange="handleAnswer(${index}, ${optIndex})">
+                            <span class="mr-2 text-lg">${opt}</span>
+                        </label>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex items-start mb-4">
+                        <span class="text-xl font-bold text-purple-700 ml-3">${index + 1}.</span>
+                        <h3 class="text-lg font-semibold leading-relaxed">${q.q}</h3>
+                    </div>
+                    <div class="flex flex-col gap-2 pr-8">
+                        ${optionsHtml}
+                    </div>
+                    <div class="explanation-box" id="exp-${index}">
+                        <strong>توضيح:</strong> ${q.exp}
+                    </div>
+                `;
+                questionsList.appendChild(card);
+            });
+        }
+
+        function handleAnswer(qIndex, selectedOptIndex) {
+            if (isSubmitted) return; // Prevent changes after submit
+            
+            userAnswers[qIndex] = selectedOptIndex;
+            updateProgress();
+
+            if (currentMode === 'practice') {
+                const questionData = quizData[qIndex];
+                const isCorrect = (selectedOptIndex === questionData.correct);
+                
+                // Reset styling for this question
+                for(let i=0; i<questionData.opts.length; i++){
+                    document.getElementById(`label-${qIndex}-${i}`).classList.remove('option-correct', 'option-incorrect');
+                }
+                
+                const selectedLabel = document.getElementById(`label-${qIndex}-${selectedOptIndex}`);
+                
+                if (isCorrect) {
+                    selectedLabel.classList.add('option-correct');
+                } else {
+                    selectedLabel.classList.add('option-incorrect');
+                    // Highlight correct answer
+                    if (questionData.correct !== undefined) {
+                        document.getElementById(`label-${qIndex}-${questionData.correct}`).classList.add('option-correct');
+                    }
+                }
+
+                // Show explanation
+                if (questionData.exp) {
+                    document.getElementById(`exp-${qIndex}`).style.display = 'block';
+                }
+                
+                // Disable other inputs for this question in practice mode
+                const radios = document.getElementsByName(`q${qIndex}`);
+                radios.forEach(radio => radio.disabled = true);
+            }
+        }
+
+        function updateProgress() {
+            const answered = Object.keys(userAnswers).length;
+            const total = quizData.length;
+            const percentage = (answered / total) * 100;
+            
+            answeredCountEl.textContent = answered;
+            progressBar.style.width = percentage + '%';
+        }
+
+        function startTimer(minutes) {
+            timeRemaining = minutes * 60;
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    alert("انتهى الوقت! سيتم تسليم الاختبار تلقائياً.");
+                    submitQuiz();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+            const s = (timeRemaining % 60).toString().padStart(2, '0');
+            timerDisplay.textContent = `${m}:${s}`;
+            
+            if (timeRemaining < 60) {
+                timerDisplay.style.color = 'var(--error)';
+            }
+        }
+
+        function submitQuiz() {
+            if (isSubmitted) return;
+            
+            const answered = Object.keys(userAnswers).length;
+            if (answered < quizData.length && timeRemaining > 0) {
+                if(!confirm(`لم تجب على جميع الأسئلة (${answered}/${quizData.length}). هل أنت متأكد من رغبتك في التسليم؟`)){
+                    return;
+                }
+            }
+
+            isSubmitted = true;
+            if (timerInterval) clearInterval(timerInterval);
+            
+            calculateResults();
+        }
+
+        function calculateResults() {
+            let correctCount = 0;
+            let incorrectCount = 0;
+            let unansweredCount = 0;
+
+            quizData.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                
+                // Disable all radio inputs
+                const radios = document.getElementsByName(`q${index}`);
+                radios.forEach(radio => radio.disabled = true);
+
+                if (userAnswer === undefined) {
+                    unansweredCount++;
+                } else if (userAnswer === q.correct) {
+                    correctCount++;
+                } else {
+                    incorrectCount++;
+                }
+            });
+
+            const totalScore = correctCount * QUESTION_SCORE;
+            const maxScore = quizData.length * QUESTION_SCORE;
+            const studentName = document.getElementById('studentName').value;
+
+            // Update Results UI
+            document.getElementById('resultStudentName').textContent = `الطالب: ${studentName}`;
+            document.getElementById('finalScoreDisplay').textContent = `${totalScore} / ${maxScore}`;
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('incorrectCount').textContent = incorrectCount;
+            document.getElementById('unansweredCount').textContent = unansweredCount;
+
+            quizContainer.classList.add('hidden');
+            progressContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+            
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function showCorrectAnswers() {
+            quizContainer.classList.remove('hidden');
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('showAnswersBtn').style.display = 'none'; // Hide button after clicking
+
+            quizData.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                
+                // Show explanation
+                if(q.exp) document.getElementById(`exp-${index}`).style.display = 'block';
+
+                if (userAnswer !== undefined) {
+                    const selectedLabel = document.getElementById(`label-${index}-${userAnswer}`);
+                    if (userAnswer === q.correct) {
+                        selectedLabel.classList.add('option-correct');
+                    } else {
+                        selectedLabel.classList.add('option-incorrect');
+                        // highlight correct
+                        if(q.correct !== undefined) {
+                            document.getElementById(`label-${index}-${q.correct}`).classList.add('option-correct');
+                        }
+                    }
+                } else {
+                    // Unanswered, just highlight correct
+                    if(q.correct !== undefined) {
+                         document.getElementById(`label-${index}-${q.correct}`).classList.add('option-correct');
+                    }
+                    document.getElementById(`q-card-${index}`).style.borderRight = "4px solid var(--text-secondary)";
+                }
+            });
+            
+            window.scrollTo({top: quizContainer.offsetTop - 20, behavior: 'smooth'});
+        }
+    </script>
+</body>
+</html>
